@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         pickDateBtn=findViewById(R.id.idBtnPickDate)
         selectedDateTV=findViewById(R.id.idTVSelectedDate)
 
+
         pickDateBtn.setOnClickListener {
             val c= Calendar.getInstance()
             val year =c.get(Calendar.YEAR)

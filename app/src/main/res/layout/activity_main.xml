@@ -15,6 +15,13 @@
         android:layout_marginTop="10dp"
         android:id="@+id/linearLayout2">
 
+        <Button
+        android:id="@+id/listButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:text="L"
+        android:layout_gravity="right"/>
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="122dp"
@@ -41,7 +48,8 @@
             android:layout_height="49dp"
             android:ems="10"
             android:hint="Grocery item (eggs)"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            />
 
         <EditText
             android:id="@+id/emailInput"
@@ -88,6 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Submit" />
+
     </LinearLayout>
 
 </RelativeLayout>

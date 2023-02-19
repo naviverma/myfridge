@@ -38,6 +38,9 @@ class DataBaseHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE
         cv.put(COL_NOOFITEMS,glist.noOfItems)
         cv.put(COl_DATE,glist.expiryDate)
         var result = db.insert(TABLE_NAME,null,cv)
+
+        //This is just for debugging
+
         if(result == -1.toLong())
             Toast.makeText(context,"Failed",Toast.LENGTH_SHORT).show()
         else

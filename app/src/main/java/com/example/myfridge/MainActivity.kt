@@ -1,13 +1,17 @@
 package com.example.myfridge
-import android.app.DatePickerDialog
+import android.app.*
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
+import kotlin.time.Duration.Companion.days
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +28,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var selectedDateTV: TextView
 
     lateinit var submitButton: Button//button property
+
+    //Notification related initialisations
+    private  var dayNotfication: Int = 0
+    private  var monthNotification: Int = 0
+    private  var yearNotification: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +56,13 @@ class MainActivity : AppCompatActivity() {
             var  datePickerDialog =DatePickerDialog(
                 this,
                 { view,year,monthOfYear,dayOfMonth->
+
+                    dayNotfication=dayOfMonth
+                    monthNotification=monthOfYear
+                    yearNotification=year
+
                     selectedDateTV.text=(dayOfMonth.toString() +"/"+(monthOfYear+1)+"/"+year)
-                    expiryDate = "$dayOfMonth-${monthOfYear+1}-$year"//very very sexy
+                    expiryDate = "$dayOfMonth-${monthOfYear+1}-$year"
                 },
                 year,
                 month,
@@ -56,11 +70,10 @@ class MainActivity : AppCompatActivity() {
 
             )
             datePickerDialog.show()
-
-
-
-
         }
+
+        //Notification related
+        createNotificationChannel()
 
         gNameInput = findViewById(R.id.nameInput)
         websiteInput = findViewById(R.id.emailInput)
@@ -77,6 +90,8 @@ class MainActivity : AppCompatActivity() {
                 var db= DataBaseHandler(context)
                 db.insertData(glist)
 
+                //Function for notifications
+                scheduleNotification()
 
             }else{
                 Toast.makeText(context,"Please Fill all the required items",Toast.LENGTH_SHORT).show()
@@ -84,5 +99,51 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+        private fun scheduleNotification() {
+        val intent = Intent(applicationContext, Notification::class.java)
+        val title="ITEM EXPIRY CLOSE"
+        val message="Some items in your fridge are close to expiring"
+        intent.putExtra(titleExtra,title)
+        intent.putExtra(messageExtra,message)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            notificationID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val alarmManager= getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val time=getTime()
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            time,
+            pendingIntent
+        )
+        Toast.makeText(applicationContext,"Reminder Notification Set!",Toast.LENGTH_SHORT).show()
+    }
+
+
+
+    //TODO: if time doesn't work properly
+    private fun getTime(): Long {
+        val hour=10
+        val minute=0
+        val calendar=Calendar.getInstance()
+        calendar.set(yearNotification, monthNotification,dayNotfication,hour,minute)
+        return calendar.timeInMillis
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O) //Remove if doesn't work
+    private fun createNotificationChannel() {
+        val name="Notif Channel"
+        val desc="A description of the Channel"
+        val importance= NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(channelID,name,importance)
+        channel.description=desc
+        val notificationManager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
 }
 
